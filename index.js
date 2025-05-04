@@ -1,5 +1,5 @@
 const express = require('express');
-const fetch = require('node-fetch');
+const cloudscraper = require('cloudscraper');
 const pretty = require('pretty');
 
 const app = express();
@@ -19,10 +19,12 @@ app.get('/', async (req, res) => {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
     };
 
-    const response = await fetch(targetUrl, { headers });
-    const rawHtml = await response.text();
-    const formattedHtml = pretty(rawHtml);
+    const rawHtml = await cloudscraper.get({
+      uri: targetUrl,
+      headers,
+    });
 
+    const formattedHtml = pretty(rawHtml);
     res.send(`<pre>${escapeHtml(formattedHtml)}</pre>`);
   } catch (error) {
     res.status(500).send('Error: ' + error.message);
