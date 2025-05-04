@@ -1,13 +1,12 @@
 {
   "name": "urlscraper",
   "version": "1.0.0",
-  "description": "Lightweight URL scraper using axios and pretty",
+  "description": "Scraper using raw https and pretty",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "axios": "^1.6.8",
     "express": "^4.19.2",
     "pretty": "^2.0.0"
   }

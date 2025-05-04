@@ -1,56 +1,73 @@
 const express = require("express");
-const axios = require("axios");
-const pretty = require("pretty");
+const https = require("https");
 const { URL } = require("url");
+const pretty = require("pretty");
 
 const app = express();
 const PORT = 3000;
 
 app.get("/", async (req, res) => {
   const targetUrl = req.query.url;
-  if (!targetUrl) return res.status(400).send("Missing ?url parameter");
+  if (!targetUrl) {
+    return res.status(400).send("Missing ?url parameter");
+  }
 
   try {
     const parsedUrl = new URL(targetUrl);
-    const base = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+    const baseOrigin = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
-    const response = await axios.get(targetUrl, {
+    const options = {
+      hostname: parsedUrl.hostname,
+      path: parsedUrl.pathname + (parsedUrl.search || ""),
+      method: "GET",
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept":
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
-        "Cache-Control": "no-cache",
+        "Referer": baseOrigin,
+        "Origin": baseOrigin,
         "Connection": "keep-alive",
-        "Referer": base,
-        "Origin": base,
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "same-origin",
         "Sec-Fetch-User": "?1"
-      },
-      timeout: 10000,
-      validateStatus: null // Prevent axios from throwing on 403s
-    });
+      }
+    };
 
-    if (response.status >= 400) {
-      console.error("Blocked or failed request:", response.status);
-      return res
-        .status(response.status)
-        .send(`Target returned HTTP ${response.status}`);
-    }
+    https
+      .get(options, (response) => {
+        let data = "";
 
-    const formattedHtml = pretty(response.data);
-    res.set("Content-Type", "text/html");
-    res.send(formattedHtml);
-  } catch (error) {
-    console.error("Request error:", error.message);
-    res.status(500).send("Failed to fetch or parse URL.");
+        response.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        response.on("end", () => {
+          if (response.statusCode >= 400) {
+            console.error("Failed with status:", response.statusCode);
+            return res
+              .status(response.statusCode)
+              .send(`Target returned HTTP ${response.statusCode}`);
+          }
+
+          const formattedHtml = pretty(data);
+          res.set("Content-Type", "text/html");
+          res.send(formattedHtml);
+        });
+      })
+      .on("error", (err) => {
+        console.error("HTTPS error:", err.message);
+        res.status(500).send("Failed to fetch URL.");
+      });
+  } catch (err) {
+    console.error("URL parse error:", err.message);
+    res.status(400).send("Invalid URL.");
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Scraper running at http://localhost:${PORT}/?url=https://example.com`);
+  console.log(`Server running: http://localhost:${PORT}/?url=https://example.com`);
 });
