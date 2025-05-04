@@ -1,17 +1,14 @@
 {
   "name": "urlscraper",
   "version": "1.0.0",
-  "description": "Scrapes and formats HTML from a given URL with custom headers",
+  "description": "Lightweight URL scraper using axios and pretty",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "axios": "^1.9.0",
-    "cloudscraper": "^4.6.0",
-    "express": "^4.21.2",
-    "node-fetch": "^2.6.7",
-    "playwright": "^1.52.0",
+    "axios": "^1.6.8",
+    "express": "^4.19.2",
     "pretty": "^2.0.0"
   }
 }
