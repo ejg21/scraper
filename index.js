@@ -16,14 +16,24 @@ app.get('/', async (req, res) => {
     const headers = {
       'Referer': origin,
       'Origin': origin,
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     };
 
     const response = await fetch(targetUrl, { headers });
     const rawHtml = await response.text();
     const formattedHtml = pretty(rawHtml);
 
-    res.send(`<pre>${escapeHtml(formattedHtml)}</pre>`);
+    const escapedHtml = escapeHtml(formattedHtml);
+
+    const footer = `
+<hr>
+<b>Headers Used:</b><br>
+User-Agent: ${headers['User-Agent']}<br>
+Referer: ${headers['Referer']}<br>
+Origin: ${headers['Origin']}
+    `.trim();
+
+    res.send(`<pre>${escapedHtml}</pre>${footer}`);
   } catch (error) {
     res.status(500).send('Error: ' + error.message);
   }
