@@ -12,17 +12,22 @@ app.get('/', async (req, res) => {
   }
 
   try {
-    const { origin } = new URL(targetUrl);
+    const parsedUrl = new URL(targetUrl);
+    const hostname = parsedUrl.hostname;
+
+    // Use special headers if the domain is api.rgshows.me
+    const isRgshowsApi = hostname === 'api.rgshows.me';
+    const refererOrigin = isRgshowsApi ? 'https://vidsrc.wtf' : parsedUrl.origin;
+
     const headers = {
-      'Referer': origin,
-      'Origin': origin,
+      'Referer': refererOrigin,
+      'Origin': refererOrigin,
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     };
 
     const response = await fetch(targetUrl, { headers });
     const rawHtml = await response.text();
     const formattedHtml = pretty(rawHtml);
-
     const escapedHtml = escapeHtml(formattedHtml);
 
     const footer = `
