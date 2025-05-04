@@ -1,5 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const pretty = require('pretty');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,9 +20,10 @@ app.get('/', async (req, res) => {
     };
 
     const response = await fetch(targetUrl, { headers });
-    const body = await response.text();
+    const rawHtml = await response.text();
+    const formattedHtml = pretty(rawHtml);
 
-    res.send(`<pre>${escapeHtml(body)}</pre>`);
+    res.send(`<pre>${escapeHtml(formattedHtml)}</pre>`);
   } catch (error) {
     res.status(500).send('Error: ' + error.message);
   }

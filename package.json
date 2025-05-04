@@ -1,13 +1,14 @@
 {
-  "name": "scraper",
+  "name": "urlscraper",
   "version": "1.0.0",
-  "description": "URL scraper that sets dynamic Referer and Origin headers",
+  "description": "Scrapes and formats HTML from a given URL with custom headers",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "pretty": "^2.0.0"
   }
 }
