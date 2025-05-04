@@ -23,6 +23,9 @@ app.get('/', async (req, res) => {
     if (hostname === 'api.rgshows.me') {
       headers['Referer'] = 'https://vidsrc.wtf';
       headers['Origin'] = 'https://vidsrc.wtf';
+    } else if (hostname === 'oca.kendrickl-3amar.site') {
+      headers['Referer'] = 'https://xprime.tv';
+      headers['Origin'] = 'https://xprime.tv';
     } else if (hostname !== 'vidsrc.su') {
       headers['Referer'] = parsedUrl.origin;
       headers['Origin'] = parsedUrl.origin;
