@@ -23,14 +23,11 @@ app.get('/', async (req, res) => {
     if (hostname === 'api.rgshows.me') {
       headers['Referer'] = 'https://vidsrc.wtf';
       headers['Origin'] = 'https://vidsrc.wtf';
-    } else if (hostname === 'g9uxp3w0zlkrt4su.blorvaxlight15.xyz') {
-      headers['Referer'] = 'https://vidsrc.su';
-      headers['Origin'] = 'https://vidsrc.su';
     } else if (hostname !== 'vidsrc.su') {
       headers['Referer'] = parsedUrl.origin;
       headers['Origin'] = parsedUrl.origin;
     }
-    // If vidsrc.su, do not add Referer or Origin
+    // If vidsrc.su or g9uxp3w0zlkrt4su.blorvaxlight15.xyz, do not add Referer or Origin
 
     const response = await fetch(targetUrl, { headers });
     const rawHtml = await response.text();
