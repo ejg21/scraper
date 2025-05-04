@@ -1,5 +1,7 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const pretty = require('pretty');
 
 const app = express();
@@ -19,22 +21,34 @@ app.get('/', async (req, res) => {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
     };
 
-    if (hostname === 'api.rgshows.me') {
-      headers['Referer'] = 'https://vidsrc.wtf';
-      headers['Origin'] = 'https://vidsrc.wtf';
-    } else if (hostname !== 'vidsrc.su') {
-      headers['Referer'] = parsedUrl.origin;
-      headers['Origin'] = parsedUrl.origin;
+    let html = '';
+    let usedTool = '';
+    
+    if (hostname === 'vidsrc.su') {
+      // Use axios and cheerio without Referer/Origin
+      const response = await axios.get(targetUrl, { headers });
+      const $ = cheerio.load(response.data);
+      html = pretty($.html());
+      usedTool = 'axios + cheerio';
+    } else {
+      // Set headers depending on host
+      if (hostname === 'api.rgshows.me') {
+        headers['Referer'] = 'https://vidsrc.wtf';
+        headers['Origin'] = 'https://vidsrc.wtf';
+      } else {
+        headers['Referer'] = parsedUrl.origin;
+        headers['Origin'] = parsedUrl.origin;
+      }
+
+      const response = await fetch(targetUrl, { headers });
+      html = pretty(await response.text());
+      usedTool = 'node-fetch';
     }
-    // If vidsrc.su, no Referer or Origin added
 
-    const response = await fetch(targetUrl, { headers });
-    const rawHtml = await response.text();
-    const formattedHtml = pretty(rawHtml);
-    const escapedHtml = escapeHtml(formattedHtml);
-
+    const escapedHtml = escapeHtml(html);
     const footer = `
 <hr>
+<b>Tool Used:</b> ${usedTool}<br>
 <b>Headers Used:</b><br>
 User-Agent: ${headers['User-Agent']}<br>
 Referer: ${headers['Referer'] || 'N/A'}<br>
