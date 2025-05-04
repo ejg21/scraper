@@ -15,15 +15,18 @@ app.get('/', async (req, res) => {
     const parsedUrl = new URL(targetUrl);
     const hostname = parsedUrl.hostname;
 
-    // Use special headers if the domain is api.rgshows.me
-    const isRgshowsApi = hostname === 'api.rgshows.me';
-    const refererOrigin = isRgshowsApi ? 'https://vidsrc.wtf' : parsedUrl.origin;
-
-    const headers = {
-      'Referer': refererOrigin,
-      'Origin': refererOrigin,
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    let headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
     };
+
+    if (hostname === 'api.rgshows.me') {
+      headers['Referer'] = 'https://vidsrc.wtf';
+      headers['Origin'] = 'https://vidsrc.wtf';
+    } else if (hostname !== 'vidsrc.su') {
+      headers['Referer'] = parsedUrl.origin;
+      headers['Origin'] = parsedUrl.origin;
+    }
+    // If vidsrc.su, no Referer or Origin added
 
     const response = await fetch(targetUrl, { headers });
     const rawHtml = await response.text();
@@ -34,8 +37,8 @@ app.get('/', async (req, res) => {
 <hr>
 <b>Headers Used:</b><br>
 User-Agent: ${headers['User-Agent']}<br>
-Referer: ${headers['Referer']}<br>
-Origin: ${headers['Origin']}
+Referer: ${headers['Referer'] || 'N/A'}<br>
+Origin: ${headers['Origin'] || 'N/A'}
     `.trim();
 
     res.send(`<pre>${escapedHtml}</pre>${footer}`);
