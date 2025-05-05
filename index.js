@@ -31,6 +31,7 @@ app.get('/', async (req, res) => {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     } else if (hostname === 'frostywinds73.pro') {
       headers['Referer'] = 'https://xprime.tv/foxtemp';
+      headers['Origin'] = 'https://xprime.tv/foxtemp';
     } else if (hostname === 'c2tjzlkedcnp.cdn-centaurus.com') {
       headers['Referer'] = 'https://uqloads.xyz';
       headers['Origin'] = 'https://uqloads.xyz';
