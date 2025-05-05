@@ -19,13 +19,18 @@ app.get('/', async (req, res) => {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
     };
 
-    // Custom header logic based on hostname
-    if (hostname === 'api.rgshows.me') {
-      headers['Referer'] = 'https://vidsrc.wtf';
-      headers['Origin'] = 'https://vidsrc.wtf';
-    } else if (hostname === 'oca.kendrickl-3amar.site') {
+    // CORS headers for https://oca.kendrickl-3amar.site
+    if (hostname === 'oca.kendrickl-3amar.site') {
       headers['Referer'] = 'https://xprime.tv';
       headers['Origin'] = 'https://xprime.tv';
+
+      // Allow CORS for this domain
+      res.setHeader('Access-Control-Allow-Origin', 'https://oca.kendrickl-3amar.site');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    } else if (hostname === 'api.rgshows.me') {
+      headers['Referer'] = 'https://vidsrc.wtf';
+      headers['Origin'] = 'https://vidsrc.wtf';
     } else if (hostname !== 'vidsrc.su') {
       headers['Referer'] = parsedUrl.origin;
       headers['Origin'] = parsedUrl.origin;
